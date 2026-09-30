@@ -1,0 +1,18 @@
+# Ignore all presentations and lecture slides
+*.pptx
+*.pptsx
+*.ppt
+*.ppsx
+*.pps
+
+# Ignore all PDF manuals and documents
+*.pdf
+*.docx
+*.doc
+
+# Python cache / artifacts
+__pycache__/
+*.py[cod]
+.env
+.venv/
+venv/
