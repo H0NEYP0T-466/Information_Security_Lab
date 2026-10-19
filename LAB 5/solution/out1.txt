@@ -1,0 +1,18 @@
+====================================================================
+ TASK 1 : DES ENCRYPTION / DECRYPTION (ECB MODE)
+====================================================================
+Key (8 bytes, hex) : d29bca70e1364b91
+Key length         : 64 bits
+
+Original plaintext : Lahore Garrison University - DES ECB demo block cipher lab.
+Plaintext bytes    : 4c61686f7265204761727269736f6e20556e6976657273697479202d20444553204543422064656d6f20626c6f636b20636970686572206c61622e
+Plaintext length   : 59 bytes
+
+Ciphertext (hex)   : d149a3e535475231a86817bc8c84b6a0455da8f403816405b2d75c870a15849d9382e57ada888de5bf81623610b4cb3dffa5a7c7ec8f2c627ee4e99a3ebca90b
+Ciphertext length  : 64 bytes (8 blocks of 8 bytes)
+
+Decrypted plaintext: Lahore Garrison University - DES ECB demo block cipher lab.
+Decrypted bytes    : 4c61686f7265204761727269736f6e20556e6976657273697479202d20444553204543422064656d6f20626c6f636b20636970686572206c61622e
+
+Match with original: True
+====================================================================

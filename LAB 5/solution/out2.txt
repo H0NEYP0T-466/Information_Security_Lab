@@ -1,0 +1,25 @@
+====================================================================
+ TASK 2 : MEET-IN-THE-MIDDLE ATTACK ON DOUBLE DES
+====================================================================
+Plaintext  P        : MITM-DEM  (4d49544d2d44454d)
+Secret K1           : 0x0a2b
+Secret K2           : 0x1c4d
+Intermediate E(K1,P): d43786b3fc59040e
+Ciphertext C        : aa3e7d2ee92e81e3
+
+Effective keyspace  : 2^14 = 16,384 keys per half
+Brute force (2DES)  : 2^28 = 268,435,456 operations
+MITM (2 x 2^14)    : 32,768 operations
+Speed-up factor     : 8,192x
+
+Forward table built : 16,384 entries in 1815.7 ms
+Backward search     : 1038.9 ms
+Total attack time   : 2.85 s
+
+Recovered K1        : 0x0a2b  -> match: True
+Recovered K2        : 0x1c4d  -> match: True
+
+Re-encrypt with k1,k2 : aa3e7d2ee92e81e3
+Original ciphertext   : aa3e7d2ee92e81e3
+Attack successful     : True
+====================================================================

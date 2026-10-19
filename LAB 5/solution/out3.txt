@@ -1,0 +1,28 @@
+====================================================================
+ TASK 3.1 : AES-128 CBC TEXT ENCRYPTION
+====================================================================
+Key (16 bytes) : ddebe4b34f4ddf7b2539a65fd083c9c3
+IV  (16 bytes) : 72ce9d65050c89efef1ec541dbb06409
+Plaintext      : AES in CBC mode chains each block with the previous ciphertext.
+Plain length   : 63 bytes
+Ciphertext     : db0d2a52fa267a8a2f8424adc72aea4891f3531e8389506697ccf14d83b383e1484e00ce6da50e07a1592fa1e343e8dedff525d14f15c7502bc53b38a61f1ffe
+Cipher length  : 64 bytes (4 blocks)
+Recovered      : AES in CBC mode chains each block with the previous ciphertext.
+Round-trip OK  : True
+
+====================================================================
+ TASK 3.2 : AES-128 CBC FILE ENCRYPTION (64 KB CHUNKS)
+====================================================================
+Source file     : sample_data.bin  (300,000 bytes)
+Container       : sample_data.enc  (300,048 bytes)
+  header        : 32 bytes  (magic 8 + size 8 + IV 16)
+  payload       : 300,016 bytes
+Session key     : b62474ad2c3090dd4c0961f4fcbabcde   (kept out of the container)
+IV              : a64bcf8567a43b7f8709a8c1e396a05e
+Header layout   : MAGIC=AESCBC01 | SIZE=300000 | IV=a64bcf8567a43b7f...
+
+Decrypted file  : sample_data.dec  (300,000 bytes)
+SHA-256 source  : d34e034bc1f17ca27e0e1fa6fe397a25a0e43e41d2146a21907badc426298ca0
+SHA-256 restored: d34e034bc1f17ca27e0e1fa6fe397a25a0e43e41d2146a21907badc426298ca0
+Files identical : True
+====================================================================
