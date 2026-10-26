@@ -1,0 +1,51 @@
+====================================================================
+ TASK 1 : BIRTHDAY ATTACK - 16-BIT TRUNCATED SHA-256
+====================================================================
+Hash function      : SHA-256 (FIPS 180-4)
+Truncation         : first 16 bits (2 bytes)
+Tag space          : 2^16 = 65,536 possible values
+Birthday bound     : sqrt(pi/2 * 2^16) = 320.8 messages for 50% chance
+
+-- Single run ------------------------------------------------------
+Message A          : LGU-IS-Lab06 | msg 0000131 | nonce 21c8440364c0
+SHA-256(A)         : 12932cf6be32c75aa6f7ab9cace58c9b5891d237bcb077f113d1fba90f499f42
+Truncated tag A    : 1293
+
+Message B          : LGU-IS-Lab06 | msg 0000229 | nonce a3ccf6c97d87
+SHA-256(B)         : 1293830f0d73829687139cc646ec4b2d06a4559338079941e10f6f34a66c3f07
+Truncated tag B    : 1293
+
+Messages generated : 230
+Collisions found   : 1
+Time taken         : 1.08 ms
+
+A is different from B : True
+Truncated tags equal  : True
+Full hashes equal     : False
+Collision probability : 33.09% after 230 messages
+
+-- Statistics over 200 independent trials ----------------------
+Minimum            : 18 messages
+Q1 / median / Q3   : 207 / 302 / 439 messages
+Maximum            : 1200 messages
+Mean               : 336.2 messages
+Standard deviation : 196.8 messages
+Theoretical mean   : 320.8 messages
+Deviation          : +4.8%
+
+Distribution (bucket = 100 messages)
+     0-99   ############## 14
+   100-199  ################################## 34
+   200-299  ################################################# 49
+   300-399  ########################################## 42
+   400-499  ######################### 25
+   500-599  ################## 18
+   600-699  ######### 9
+   700-799  ### 3
+   800-899  ### 3
+   900-999  # 1
+  1000-1099 # 1
+  1100-1199 # 1
+
+Half of all attacks succeed within 302 messages (0.5% of the tag space)
+====================================================================

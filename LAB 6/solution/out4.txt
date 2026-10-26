@@ -1,0 +1,51 @@
+====================================================================
+ TASK 4 : PASSWORD HASHING WITH SALT + PBKDF2 VERIFICATION
+====================================================================
+Algorithm          : PBKDF2-HMAC-SHA256
+Iterations         : 100,000
+Salt               : 16 random bytes per password
+Derived key        : 32 bytes
+
+-- Registration ----------------------------------------------------
+Enter password to register : HashLab@2026
+
+Stored record
+  algorithm  : pbkdf2_hmac_sha256
+  iterations : 100,000
+  salt       : be5dad3b8bfab90cd88ef010f8ae06cf   (16 bytes, random)
+  hash       : 2042c8978d3f43ee2649e9f0de95fa58ecf7c0f4d3a660e526f4cb68f4ac3f08
+  record size: 48 bytes (salt + derived key)
+
+Plaintext password stored : False
+
+-- Verification ----------------------------------------------------
+Enter password to verify   : HashLab@2026
+
+Password accepted  : True
+Comparison         : hmac.compare_digest (constant time)
+
+Enter a wrong password     : HashLab@2025
+
+Password accepted  : False
+Result             : access denied
+
+-- Salt uniqueness -------------------------------------------------
+User A (password = HashLab@2026)
+  salt : 7bb39e51741cde9ac913aeba03bb011e
+  hash : 795f3c802221fde66e7a4a90e84860db472445e75bf19ad9530f1b94313df9a4
+User B (same password)
+  salt : af54691ce45b6b3466c7f2ce064a88cf
+  hash : fc940e7e2c91af02ee7b7566c7b7db42a73aae7617a7d163969e5e23a2a87f0e
+
+Same password, same salt  : False
+Same password, same hash  : False
+A verifies its password   : True
+B verifies its password   : True
+A's record rejects a wrong password : True
+
+-- Attack impact ---------------------------------------------------
+Unsalted, 1M-entry rainbow table cracks every user with that password
+With a 16-byte salt the attacker needs 2^128 = 3.403e+38 tables
+Cost multiplier per user  : 3.403e+38
+Stored hash is useless for a second account: True
+====================================================================

@@ -1,0 +1,38 @@
+====================================================================
+ TASK 2 : SHA-256 COLLISION DETECTION (COMPLETE 256-BIT HASH)
+====================================================================
+Hash function      : SHA-256, no truncation
+Digest size        : 256 bits = 32 bytes
+Messages to hash   : 1,000,000
+Message format     : counter + 64 random bits (all distinct)
+
+-- Scanning -------------------------------------------------------
+Messages generated : 1,000,000
+Unique digests     : 1,000,000
+Collisions found   : 0
+Elapsed            : 7.46 s
+Throughput         : 134,083 hashes/s
+
+Digest space       : 2^256 = 1.158e+77
+Birthday bound     : 2^128 = 3.403e+38 messages for 50% chance
+P(collision) after : 4.318e-66   (n^2 / 2^257)
+Years at 1e9/s     : 1.079e+22
+
+Result             : no collision found
+Reason             : 2^128 work factor is beyond any machine
+Conclusion         : complete SHA-256 behaves as collision resistant
+
+-- Same generator, truncated tags ---------------------------------
+ Bits      Tag space  Trials   Mean msgs  Birthday bound   Ratio
+   16         65,536     200         328             321   1.02x
+   24     16,777,216      60       5,100           5,134   0.99x
+   32  4,294,967,296      15      99,145          82,137   1.21x
+
+Each 8 extra bits of tag multiply the work by about 2^4 = 16
+16 -> 24 bits : 15.5x more messages (theory 16.0x)
+24 -> 32 bits : 19.4x more messages (theory 16.0x)
+
+Extrapolation to the full digest
+  32-bit tag  : 99,145 messages
+  +224 bits   : 2^112 x more work -> 2^128 messages, unreachable
+====================================================================

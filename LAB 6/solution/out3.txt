@@ -1,0 +1,41 @@
+====================================================================
+ TASK 3 : HASH STRETCHING - PBKDF2-HMAC-SHA256
+====================================================================
+Password           : HashLab@2026  (12 chars)
+Salt (fixed)       : 4c47552d49534c414230362d53414c54
+Derived key length : 32 bytes (256 bits)
+Repeats per timing : 10 (fastest run reported)
+
+-- Iteration cost -------------------------------------------------
+  Iterations   Best (ms)   Mean (ms)   us / iter  Cost vs 1k
+       1,000        1.36        2.74        1.36        1.0x
+      10,000       14.65       27.94        1.46       10.8x
+     100,000      141.29      172.25        1.41      104.1x
+
+Per-iteration cost stays in a narrow band (1.36 - 1.46 us)
+while the iteration count changes 100x, so the total time is linear in
+the iteration count: 10x iterations -> ~10x slower.
+
+-- Derived keys ---------------------------------------------------
+   1,000 iterations : 6899e81f0437ba25aebfcd39b63ac5e2c6ab5dca73ec075f41e4a366a4adf150
+  10,000 iterations : 7c29544a46cbab79c63dbde0b721974d1aaf06493bfd49c189cef2c02552545c
+ 100,000 iterations : 8af985bf80fc958dace5ff2c0d7099d42f014fbabafe2898ef58263acb7ec091
+
+Keys differ with iteration count : True
+Same parameters give same key    : True
+Different salt gives other key   : True
+
+-- Attacker view ---------------------------------------------------
+GPU model          : 1e+10 SHA-256 ops/s
+Password space     : 36^6 = 2,176,782,336 (6 chars, a-z0-9)
+
+  Iterations   Guesses/s (GPU)    1 guess   Exhaust space
+       1,000        10,000,000    0.10 us         3.6 min
+      10,000         1,000,000    1.00 us        36.3 min
+     100,000           100,000   10.00 us          6.05 h
+
+Unstretched SHA-256: 10,000,000,000 guesses/s -> 217.68 ms to exhaust the space
+PBKDF2 100,000     : 100,000 guesses/s -> slowdown of 100,000x
+
+Measured cost of one login at 100,000 iterations: 141.3 ms
+====================================================================
