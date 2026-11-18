@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """
-Cleanly rebuild Information_Security_Lab_OEL.docx and export to PDF.
+Populate Information_Security_Lab_OEL.docx with:
+1. Question typed first
+2. Python Code implementation (formatted in-document code box)
+3. Genuine Linux terminal window screenshot showing execution output (no code in screenshot)
 Author: Muhammad Fezan (Fall-23-BSCS-466)
 """
 
@@ -8,41 +11,78 @@ import os
 import docx
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.table import WD_TABLE_ALIGNMENT
+from docx.oxml import parse_xml
+from docx.oxml.ns import nsdecls
 
 DOCX_OUT = "/home/honeypot/Downloads/Documents/Information_Security_Lab_OEL.docx"
 DOCX_LOCAL = "/home/honeypot/Univeristy_Data/IS(L)/OEL/Information_Security_Lab_OEL.docx"
 SHOTS_DIR = "/home/honeypot/Univeristy_Data/IS(L)/OEL/solution/shots"
 
 
-def rebuild():
+def add_code_block(doc, code_str):
+    """Adds a clean, styled code block table in the Word document."""
+    tbl = doc.add_table(rows=1, cols=1)
+    tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
+    cell = tbl.cell(0, 0)
+    cell.width = Inches(6.2)
+
+    # Background color and left border
+    tcPr = cell._element.get_or_add_tcPr()
+    shd = parse_xml(f'<w:shd {nsdecls("w")} w:fill="F8F9FA"/>')
+    borders = parse_xml(
+        f'<w:tcBorders {nsdecls("w")}>'
+        f'  <w:top w:val="single" w:sz="4" w:space="0" w:color="CFD8DC"/>'
+        f'  <w:left w:val="single" w:sz="18" w:space="0" w:color="1B5E20"/>'
+        f'  <w:bottom w:val="single" w:sz="4" w:space="0" w:color="CFD8DC"/>'
+        f'  <w:right w:val="single" w:sz="4" w:space="0" w:color="CFD8DC"/>'
+        f'</w:tcBorders>'
+    )
+    tcPr.append(shd)
+    tcPr.append(borders)
+
+    # Inner cell padding
+    tcMar = parse_xml(f'<w:tcMar {nsdecls("w")}><w:top w:w="100" w:type="dxa"/><w:bottom w:w="100" w:type="dxa"/><w:left w:w="140" w:type="dxa"/><w:right w:w="140" w:type="dxa"/></w:tcMar>')
+    tcPr.append(tcMar)
+
+    p = cell.paragraphs[0]
+    p.paragraph_format.space_before = Pt(0)
+    p.paragraph_format.space_after = Pt(0)
+    p.paragraph_format.line_spacing = Pt(9.5)
+    r = p.add_run(code_str.strip("\n"))
+    r.font.name = "Consolas"
+    r.font.size = Pt(8.0)
+    r.font.color.rgb = RGBColor(26, 35, 126)  # Navy Blue
+
+
+def rebuild_document():
     doc = docx.Document(DOCX_OUT)
     body = doc._element.body
 
-    # Remove all elements after child 15 (which is the rubrics table)
-    # Collect elements to remove
-    to_remove = []
-    found_table_count = 0
+    # 1. Cleanly strip all residual elements after the 7-row Rubrics table
+    rubrics_tbl_el = None
     for child in list(body):
-        tag = child.tag.split("}")[-1]
-        if tag == "tbl":
-            found_table_count += 1
-            if found_table_count == 2:
-                # This is the rubrics table; everything after this needs removal
-                continue
-        elif found_table_count >= 2 and tag != "sectPr":
+        if child.tag.endswith("tbl") and len(child) == 7:
+            rubrics_tbl_el = child
+            break
+
+    found_rubrics = False
+    to_remove = []
+    for child in list(body):
+        if child == rubrics_tbl_el:
+            found_rubrics = True
+            continue
+        if found_rubrics and not child.tag.endswith("sectPr"):
             to_remove.append(child)
 
     for el in to_remove:
         body.remove(el)
 
-    # Clean up top paragraphs
-    # Paragraph 3: Instructor info
-    # Paragraph 4 & 5: Course code & student info
     primary_color = RGBColor(27, 94, 32)
     charcoal = RGBColor(33, 33, 33)
 
-    p_list = doc.paragraphs
-    for i, p in enumerate(p_list):
+    # 2. Format header paragraphs
+    for p in doc.paragraphs:
         if "Instructor Name:" in p.text:
             p.text = "Instructor Name: Mukkaram Ahmad Khan                                    Program/Semester: BSCS 7th (Sec L)"
             p.runs[0].font.name = "Calibri"
@@ -60,9 +100,10 @@ def rebuild():
             p.runs[0].font.bold = True
             p.runs[0].font.color.rgb = primary_color
 
-    # Add page break after rubrics table
+    # Add page break after rubrics
     doc.add_page_break()
 
+    # 3. Task definitions
     tasks = [
         {
             "num": "Question 1: Block Structure & Proof of Work (PoW) Mining Mechanism",
@@ -71,12 +112,30 @@ def rebuild():
                     "Proof of Work (PoW) mining mechanism via compute_proof_of_work() that iteratively increments a nonce "
                     "until the block hash matches a configurable leading-zero difficulty target (difficulty = 2). Link each "
                     "block via previous_hash to maintain an immutable ledger.",
-            "desc": "Implementation & Verification Summary:\n"
-                    "• Block Header: Deterministic JSON serialization ensures consistent SHA-256 hash generation across runs.\n"
-                    "• Proof-of-Work: compute_proof_of_work() increments the nonce counter until hash.startswith('0' * difficulty).\n"
-                    "• Execution: Successfully mined Genesis Block, Block #1 (nonce: 14), Block #2 (nonce: 364), and Block #3 (nonce: 9).",
-            "img": "shot_q1_block_pow.png",
-            "caption": "Screenshot 1: Block Class implementation & compute_proof_of_work() mining alongside real terminal execution output."
+            "code": """class Block:
+    def __init__(self, index: int, timestamp: float, data: Any, previous_hash: str = "", nonce: int = 0):
+        self.index: int = index
+        self.timestamp: float = timestamp
+        self.data: Any = data
+        self.previous_hash: str = previous_hash
+        self.nonce: int = nonce
+        self.hash: str = self.compute_hash()
+
+    def compute_hash(self) -> str:
+        header = {"index": self.index, "timestamp": self.timestamp, "data": self.data,
+                  "previous_hash": self.previous_hash, "nonce": self.nonce}
+        return hashlib.sha256(json.dumps(header, sort_keys=True).encode()).hexdigest()
+
+    def compute_proof_of_work(self, difficulty: int) -> int:
+        target_prefix = "0" * difficulty
+        iterations = 0
+        while not self.hash.startswith(target_prefix):
+            self.nonce += 1
+            self.hash = self.compute_hash()
+            iterations += 1
+        return iterations""",
+            "img": "shot_q1_terminal.png",
+            "caption": "Screenshot 1: Actual terminal output showing block creation and Proof-of-Work mining with difficulty = 2."
         },
         {
             "num": "Question 2: Cryptographic Chain Validation (is_chain_valid)",
@@ -84,13 +143,28 @@ def rebuild():
                     "Implement a robust chain validation mechanism is_chain_valid() to verify cryptographic hash integrity "
                     "and previous_hash linkage across all blocks. Ensure both stored hash recomputation and difficulty "
                     "criteria are rigorously checked.",
-            "desc": "Implementation & Verification Summary:\n"
-                    "• Hash Recomputation: Checks current.hash == current.compute_hash() for every block to catch data alterations.\n"
-                    "• Linkage Verification: Checks current.previous_hash == previous.hash to ensure chain continuity.\n"
-                    "• Difficulty Verification: Checks current.hash.startswith('0' * difficulty) to ensure valid proof-of-work.\n"
-                    "• Execution: Initial audit returns True (Valid) across all blocks with 100% agreement.",
-            "img": "shot_q2_chain_validation.png",
-            "caption": "Screenshot 2: is_chain_valid() implementation verifying hash recomputation, linkage, and PoW, returning True."
+            "code": """class Blockchain:
+    def is_chain_valid(self, verbose: bool = True) -> Tuple[bool, str]:
+        target_prefix = "0" * self.difficulty
+        for i in range(1, len(self.chain)):
+            current = self.chain[i]
+            previous = self.chain[i - 1]
+
+            # 1. Stored Hash Recomputation Verification
+            if current.hash != current.compute_hash():
+                return False, f"Hash Mismatch at Block #{current.index}"
+
+            # 2. Cryptographic Linkage Pointer Verification
+            if current.previous_hash != previous.hash:
+                return False, f"Linkage Broken at Block #{current.index}"
+
+            # 3. Proof-of-Work Target Criterion Verification
+            if not current.hash.startswith(target_prefix):
+                return False, f"PoW Invalidation at Block #{current.index}"
+
+        return True, "Valid" """,
+            "img": "shot_q2_terminal.png",
+            "caption": "Screenshot 2: Actual terminal output verifying stored hash recomputation, linkage, and PoW integrity."
         },
         {
             "num": "Question 3: Evaluating Blockchain Immutability via Unauthorized Data Tampering",
@@ -98,12 +172,19 @@ def rebuild():
                     "Evaluate blockchain immutability by simulating unauthorized data tampering on an existing block. Modify "
                     "the data payload of an earlier block and run is_chain_valid() to demonstrate that tampering is immediately "
                     "detected and rejected.",
-            "desc": "Implementation & Verification Summary:\n"
-                    "• Tampering Action: Attacker alters Block #1 payload from 'Alice transfers 10.0 BTC to Bob' to 'Alice transfers 100.0 BTC to Hacker'.\n"
-                    "• Detection: is_chain_valid() flags stored hash ('00821e..') mismatch against recomputed hash ('4ffffb..').\n"
-                    "• Output: Validation returns False (Tampering Successfully Detected!), proving tamper-evidence.",
-            "img": "shot_q3_tampering_simulation.png",
-            "caption": "Screenshot 3: Unauthorized data tampering on Block #1 triggering hash mismatch and validation failure (False)."
+            "code": """# Simulate Unauthorized Data Tampering on Block #1
+target_block = blockchain.chain[1]
+print(f"Original Block #1 Data : '{target_block.data}'")
+print(f"Original Block #1 Hash : '{target_block.hash}'")
+
+# Adversary alters transaction payload in-place
+target_block.data = "Alice transfers 100.0 BTC to Hacker"
+
+# Audit blockchain integrity post-tampering
+valid, status = blockchain.is_chain_valid(verbose=True)
+print(f"Validation Result       : {valid} (Tampering Successfully Detected!)")""",
+            "img": "shot_q3_terminal.png",
+            "caption": "Screenshot 3: Actual terminal output demonstrating instant tampering detection and validation failure (False)."
         },
         {
             "num": "Question 4: Simulating 51% Majority Attack (Downstream Hash Recalculation)",
@@ -111,26 +192,32 @@ def rebuild():
                     "Demonstrate a 51% majority attack where an adversary possessing majority network hash-power recalculates "
                     "the proof-of-work and hashes for the tampered block and all subsequent/downstream blocks to bypass validation, "
                     "and observe the security implications.",
-            "desc": "Implementation & Verification Summary:\n"
-                    "• Downstream Recalculation: Attacker recalculates Block #1 PoW -> updates Block #2 previous_hash -> recalculates "
-                    "Block #2 PoW -> updates Block #3 previous_hash -> recalculates Block #3 PoW.\n"
-                    "• Bypass: is_chain_valid() returns True (Valid) because all hashes, links, and difficulties match on this branch.\n"
-                    "• Security Implication: Demonstrates why decentralized consensus (majority voting / longest chain rule) is "
-                    "essential: an attacker with >50% hash power can outpace honest nodes and force peers to accept a modified history.",
-            "img": "shot_q4_51_percent_attack.png",
-            "caption": "Screenshot 4: 51% attack recalculating downstream proof-of-work hashes, restoring internal validity (True)."
+            "code": """# Simulating 51% Majority Attack: Recalculate PoW for all downstream blocks
+for i in range(1, len(blockchain.chain)):
+    curr_b = blockchain.chain[i]
+    prev_b = blockchain.chain[i - 1]
+    curr_b.previous_hash = prev_b.hash
+    curr_b.nonce = 0
+    curr_b.hash = curr_b.compute_hash()
+    curr_b.compute_proof_of_work(blockchain.difficulty)
+
+# Re-audit blockchain state post-51% recalculation
+valid, status = blockchain.is_chain_valid(verbose=True)
+print(f"Validation Result       : {valid} ({status})")""",
+            "img": "shot_q4_terminal.png",
+            "caption": "Screenshot 4: Actual terminal output showing downstream PoW recalculation bypassing validation (True)."
         }
     ]
 
     for idx, task in enumerate(tasks):
         # Heading
         h = doc.add_paragraph()
-        h.paragraph_format.space_before = Pt(6)
+        h.paragraph_format.space_before = Pt(4)
         h.paragraph_format.space_after = Pt(2)
         h.paragraph_format.keep_with_next = True
         r = h.add_run(task["num"])
         r.font.name = "Calibri"
-        r.font.size = Pt(13)
+        r.font.size = Pt(12)
         r.font.bold = True
         r.font.color.rgb = primary_color
 
@@ -140,29 +227,43 @@ def rebuild():
         p_spec.paragraph_format.space_after = Pt(2)
         r_spec = p_spec.add_run(task["spec"])
         r_spec.font.name = "Calibri"
-        r_spec.font.size = Pt(9.5)
+        r_spec.font.size = Pt(8.5)
         r_spec.font.italic = True
-        r_spec.font.color.rgb = RGBColor(60, 60, 60)
+        r_spec.font.color.rgb = RGBColor(70, 70, 70)
 
-        # Desc
-        p_desc = doc.add_paragraph()
-        p_desc.paragraph_format.space_before = Pt(0)
-        p_desc.paragraph_format.space_after = Pt(4)
-        r_desc = p_desc.add_run(task["desc"])
-        r_desc.font.name = "Calibri"
-        r_desc.font.size = Pt(9.5)
-        r_desc.font.color.rgb = charcoal
+        # Code Block Label
+        p_code_lbl = doc.add_paragraph()
+        p_code_lbl.paragraph_format.space_before = Pt(2)
+        p_code_lbl.paragraph_format.space_after = Pt(1)
+        r_code_lbl = p_code_lbl.add_run("Python Source Code:")
+        r_code_lbl.font.name = "Calibri"
+        r_code_lbl.font.size = Pt(9.0)
+        r_code_lbl.font.bold = True
+        r_code_lbl.font.color.rgb = primary_color
 
-        # Screenshot (showing code and output side-by-side)
+        # Formatted Code Block
+        add_code_block(doc, task["code"])
+
+        # Output Screenshot Header
+        p_out_lbl = doc.add_paragraph()
+        p_out_lbl.paragraph_format.space_before = Pt(3)
+        p_out_lbl.paragraph_format.space_after = Pt(1)
+        r_out_lbl = p_out_lbl.add_run("Terminal Execution Output:")
+        r_out_lbl.font.name = "Calibri"
+        r_out_lbl.font.size = Pt(9.0)
+        r_out_lbl.font.bold = True
+        r_out_lbl.font.color.rgb = primary_color
+
+        # Terminal Screenshot (Pure Terminal Window)
         img_path = os.path.join(SHOTS_DIR, task["img"])
         if os.path.exists(img_path):
             p_img = doc.add_paragraph()
-            p_img.paragraph_format.space_before = Pt(2)
-            p_img.paragraph_format.space_after = Pt(2)
+            p_img.paragraph_format.space_before = Pt(1)
+            p_img.paragraph_format.space_after = Pt(1)
             p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
             p_img.paragraph_format.keep_with_next = True
             run_img = p_img.add_run()
-            run_img.add_picture(img_path, width=Inches(6.8))
+            run_img.add_picture(img_path, width=Inches(6.2))
 
             # Caption
             p_cap = doc.add_paragraph()
@@ -171,7 +272,7 @@ def rebuild():
             p_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
             r_cap = p_cap.add_run(task["caption"])
             r_cap.font.name = "Calibri"
-            r_cap.font.size = Pt(8.5)
+            r_cap.font.size = Pt(8.0)
             r_cap.font.italic = True
             r_cap.font.color.rgb = RGBColor(90, 90, 90)
 
@@ -184,4 +285,4 @@ def rebuild():
 
 
 if __name__ == "__main__":
-    rebuild()
+    rebuild_document()

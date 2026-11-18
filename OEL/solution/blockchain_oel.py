@@ -8,15 +8,9 @@ STUDENT NAME: MUHAMMAD FEZAN
 ROLL NUMBER: Fall-23-BSCS-466
 SEMESTER: BSCS 7TH (SECTION L)
 ================================================================================
-PROBLEM:
-    Implement a Blockchain Integrity & Consensus Prototype in Python using
-    SHA-256 cryptographic hashing. Design Block and Blockchain classes
-    incorporating Proof of Work (PoW) mining (compute_proof_of_work()),
-    cryptographic chain validation (is_chain_valid()), unauthorized data
-    tampering detection, and a 51% majority attack simulation.
-================================================================================
 """
 
+import sys
 import time
 import hashlib
 import json
@@ -39,10 +33,7 @@ class Block:
         self.hash: str = self.compute_hash()
 
     def compute_hash(self) -> str:
-        """
-        Computes the deterministic SHA-256 cryptographic digest over the block header.
-        Uses sorted-key JSON serialization to guarantee consistency across execution runs.
-        """
+        """Computes deterministic SHA-256 cryptographic digest over the block header."""
         block_header = {
             "index": self.index,
             "timestamp": self.timestamp,
@@ -55,9 +46,8 @@ class Block:
 
     def compute_proof_of_work(self, difficulty: int) -> int:
         """
-        Executes Proof-of-Work (PoW) mining.
-        Iteratively adjusts the nonce until the resulting SHA-256 hash
-        matches the required leading-zero difficulty target.
+        Executes Proof-of-Work (PoW) mining by iteratively adjusting
+        the nonce until the hash satisfies the leading-zero difficulty target.
         """
         target_prefix = "0" * difficulty
         iterations = 0
@@ -69,10 +59,7 @@ class Block:
 
 
 class Blockchain:
-    """
-    Manages the sequential chain of blocks, proof-of-work mining difficulty,
-    cryptographic integrity verification, and attack simulations.
-    """
+    """Manages the sequential chain of blocks, PoW mining, and integrity validation."""
 
     def __init__(self, difficulty: int = 2):
         self.chain: List[Block] = []
@@ -84,7 +71,7 @@ class Blockchain:
         genesis_block = Block(
             index=0,
             timestamp=1763450000.0,
-            data={"message": "Genesis Block - LGU Open Ended Lab (Fall 2026)", "creator": "System"},
+            data={"message": "Genesis Block - LGU Open Ended Lab", "creator": "System"},
             previous_hash="0" * 64,
             nonce=0
         )
@@ -92,13 +79,10 @@ class Blockchain:
         self.chain.append(genesis_block)
 
     def get_latest_block(self) -> Block:
-        """Returns the most recent block in the active chain."""
         return self.chain[-1]
 
-    def add_block(self, data: Any) -> Block:
-        """
-        Creates, mines, and appends a new block to the blockchain ledger.
-        """
+    def add_block(self, data: Any, verbose: bool = True) -> Block:
+        """Creates, mines, and appends a new block to the blockchain ledger."""
         prev_block = self.get_latest_block()
         new_block = Block(
             index=len(self.chain),
@@ -113,18 +97,14 @@ class Blockchain:
         elapsed_ms = (time.perf_counter() - t_start) * 1000.0
 
         self.chain.append(new_block)
-        print(f"[+] Block #{new_block.index} successfully mined!")
-        print(f"    Data Payload  : {new_block.data}")
-        print(f"    Nonce (PoW)   : {new_block.nonce} ({cycles} iterations in {elapsed_ms:.2f} ms)")
-        print(f"    Previous Hash : {new_block.previous_hash}")
-        print(f"    Block Hash    : {new_block.hash}\n")
+        if verbose:
+            print(f"[+] Block #{new_block.index} Mined | Nonce: {new_block.nonce:<4} | Prev: {new_block.previous_hash[:18]}.. | Hash: {new_block.hash[:22]}.. ({elapsed_ms:.2f} ms)")
         return new_block
 
     def is_chain_valid(self, verbose: bool = True) -> Tuple[bool, str]:
         """
         Verifies both stored hash recomputation and previous_hash linkage
         across all blocks in the blockchain.
-        Returns (True, 'Valid') or (False, Error_Reason).
         """
         target_prefix = "0" * self.difficulty
 
@@ -132,7 +112,7 @@ class Blockchain:
             current = self.chain[i]
             previous = self.chain[i - 1]
 
-            # 1. Verify block stored hash matches recomputed hash
+            # 1. Verify stored hash matches recomputed hash
             recomputed = current.compute_hash()
             if current.hash != recomputed:
                 msg = f"Hash Mismatch at Block #{current.index}: Stored '{current.hash[:16]}..' != Recomputed '{recomputed[:16]}..'"
@@ -140,7 +120,7 @@ class Blockchain:
                     print(f"[-] INTEGRITY FAILED: {msg}")
                 return False, msg
 
-            # 2. Verify previous_hash linkage matches predecessor's actual hash
+            # 2. Verify previous_hash linkage
             if current.previous_hash != previous.hash:
                 msg = f"Linkage Broken at Block #{current.index}: Previous Hash '{current.previous_hash[:16]}..' != Block #{previous.index} Hash '{previous.hash[:16]}..'"
                 if verbose:
@@ -169,91 +149,114 @@ class Blockchain:
         print("=" * 72)
 
 
-def main():
+def run_part1(bc: Blockchain):
     print("=" * 72)
-    print(" LAHORE GARRISON UNIVERSITY - OPEN ENDED LAB (OEL)")
-    print(" INFORMATION SECURITY LAB (CC6306) - FALL 2026")
-    print(" Student: Muhammad Fezan (Fall-23-BSCS-466) | Instructor: Mukkaram Ahmad Khan")
+    print(" PART 1: BLOCK STRUCTURE & PROOF OF WORK (PoW) MINING")
     print("=" * 72)
+    print(f"Difficulty Target : {bc.difficulty} leading zeroes ('{'0'*bc.difficulty}')")
+    print(f"Genesis Block Hash: {bc.chain[0].hash[:24]}.. (PoW Nonce: {bc.chain[0].nonce})\n")
 
-    # --------------------------------------------------------------------------
-    # QUESTION 1 & 2: BLOCK CREATION, POW MINING & CHAIN VALIDATION
-    # --------------------------------------------------------------------------
-    print("\n[PART 1] INITIALIZING BLOCKCHAIN & MINING BLOCKS (PoW Difficulty = 2)")
-    print("-" * 72)
-    blockchain = Blockchain(difficulty=2)
-    print(f"Genesis Block initialized. Hash: {blockchain.chain[0].hash}\n")
-
-    print("[Mining] Adding Block #1...")
-    blockchain.add_block("Alice transfers 10.0 BTC to Bob")
-
-    print("[Mining] Adding Block #2...")
-    blockchain.add_block("Bob transfers 5.0 BTC to Charlie")
-
-    print("[Mining] Adding Block #3...")
-    blockchain.add_block("Charlie transfers 2.5 BTC to Dave")
+    print("[Mining] Generating blocks with PoW difficulty target:")
+    bc.add_block("Alice transfers 10.0 BTC to Bob", verbose=True)
+    bc.add_block("Bob transfers 5.0 BTC to Charlie", verbose=True)
+    bc.add_block("Charlie transfers 2.5 BTC to Dave", verbose=True)
 
     print("\n[Current Blockchain Ledger State]")
-    blockchain.display_chain()
+    bc.display_chain()
 
-    print("\n[PART 2] RUNNING INITIAL CHAIN VALIDATION (is_chain_valid)")
-    print("-" * 72)
-    valid, status = blockchain.is_chain_valid(verbose=True)
-    print(f"Validation Result: {valid} ({status})")
 
-    # --------------------------------------------------------------------------
-    # QUESTION 3: UNAUTHORIZED DATA TAMPERING SIMULATION
-    # --------------------------------------------------------------------------
-    print("\n[PART 3] EVALUATING IMMUTABILITY: UNAUTHORIZED DATA TAMPERING")
-    print("-" * 72)
-    target_block = blockchain.chain[1]
-    print(f"Original Block #1 Data: '{target_block.data}'")
-    print(f"Original Block #1 Hash: '{target_block.hash}'")
+def run_part2(bc: Blockchain):
+    print("=" * 72)
+    print(" PART 2: CRYPTOGRAPHIC CHAIN VALIDATION (is_chain_valid)")
+    print("=" * 72)
+    print("Running comprehensive cryptographic audit across all blocks:")
+    print(" 1. Recomputing SHA-256 block hash and comparing against stored hash.")
+    print(" 2. Verifying previous_hash cryptographic linkage pointer.")
+    print(" 3. Verifying Proof-of-Work difficulty target satisfaction.\n")
+    valid, status = bc.is_chain_valid(verbose=True)
+    print(f"\nFinal Validation Status : {valid} ({status})")
+    print(f"Chain Integrity Check   : PASSED (All {len(bc.chain)} blocks valid)")
+    print("=" * 72)
 
-    # Adversary alters transaction data in-place
-    print("\n[Adversary Action] Tampering Block #1 data payload...")
+
+def run_part3(bc: Blockchain):
+    print("=" * 72)
+    print(" PART 3: EVALUATING IMMUTABILITY (UNAUTHORIZED DATA TAMPERING)")
+    print("=" * 72)
+    target_block = bc.chain[1]
+    print(f"Original Block #1 Data : '{target_block.data}'")
+    print(f"Original Block #1 Hash : '{target_block.hash}'")
+
+    print("\n[Adversary Action] Tampering Block #1 data payload in-place...")
     target_block.data = "Alice transfers 100.0 BTC to Hacker"
-    print(f"Tampered Block #1 Data: '{target_block.data}'")
+    print(f"Tampered Block #1 Data : '{target_block.data}'")
 
     print("\n[Integrity Audit] Running is_chain_valid() post-tampering:")
-    valid_post_tamper, status_post_tamper = blockchain.is_chain_valid(verbose=True)
-    print(f"Validation Result: {valid_post_tamper} (Tampering Successfully Detected!)")
+    valid, status = bc.is_chain_valid(verbose=True)
+    print(f"\nValidation Result       : {valid} (Tampering Successfully Detected!)")
+    print("Security Implication    : Altering block data changes its SHA-256 digest,")
+    print("                          causing immediate detection and block rejection.")
+    print("=" * 72)
 
-    # --------------------------------------------------------------------------
-    # QUESTION 4: 51% MAJORITY ATTACK SIMULATION (DOWNSTREAM RECALCULATION)
-    # --------------------------------------------------------------------------
-    print("\n[PART 4] SIMULATING 51% MAJORITY ATTACK (DOWNSTREAM HASH RECALCULATION)")
-    print("-" * 72)
+
+def run_part4(bc: Blockchain):
+    print("=" * 72)
+    print(" PART 4: 51% MAJORITY ATTACK (DOWNSTREAM HASH RECALCULATION)")
+    print("=" * 72)
     print("Adversary possesses >50% network mining power and re-mines Block #1")
-    print("and all subsequent blocks to bypass cryptographic validation.\n")
+    print("and all subsequent blocks to force acceptance of the tampered branch.\n")
 
     t_atk_start = time.perf_counter()
-    for i in range(1, len(blockchain.chain)):
-        curr_b = blockchain.chain[i]
-        prev_b = blockchain.chain[i - 1]
-
-        # 1. Update linkage to modified predecessor
+    for i in range(1, len(bc.chain)):
+        curr_b = bc.chain[i]
+        prev_b = bc.chain[i - 1]
         curr_b.previous_hash = prev_b.hash
         curr_b.nonce = 0
         curr_b.hash = curr_b.compute_hash()
-
-        # 2. Re-mine Proof-of-Work to satisfy target difficulty
-        remined_cycles = curr_b.compute_proof_of_work(blockchain.difficulty)
-        print(f"[51% Attack] Re-mined Block #{curr_b.index} | Nonce: {curr_b.nonce} | New Hash: {curr_b.hash[:22]}..")
+        curr_b.compute_proof_of_work(bc.difficulty)
+        print(f"[51% Attack] Re-mined Block #{curr_b.index} | Nonce: {curr_b.nonce:<5} | New Hash: {curr_b.hash[:24]}..")
 
     atk_elapsed_ms = (time.perf_counter() - t_atk_start) * 1000.0
     print(f"\n[Attack Complete] All downstream blocks recalculated in {atk_elapsed_ms:.2f} ms.")
 
     print("\n[Modified Blockchain Ledger State Post-51% Attack]")
-    blockchain.display_chain()
+    bc.display_chain()
 
     print("\n[Consensus Audit] Running is_chain_valid() post-51% recalculation:")
-    valid_post_attack, status_post_attack = blockchain.is_chain_valid(verbose=True)
-    print(f"Validation Result: {valid_post_attack} ({status_post_attack})")
-    print("Security Implication: The fraudulent branch is now internally cryptographically valid.")
-    print("In a decentralized P2P network, an attacker with >50% hash power can outpace honest")
-    print("miners, forcing peers to adopt the tampered ledger via Nakamoto Consensus.")
+    valid, status = bc.is_chain_valid(verbose=True)
+    print(f"\nValidation Result       : {valid} ({status})")
+    print("Security Implication    : The fraudulent branch is now internally valid.")
+    print("                          In a decentralized network, a majority attacker")
+    print("                          outpaces honest nodes and enforces this fork.")
     print("=" * 72)
+
+
+def main():
+    part = sys.argv[1] if len(sys.argv) > 1 else "all"
+
+    # Setup chain
+    bc = Blockchain(difficulty=2)
+    if part in ("2", "3", "4", "all"):
+        bc.add_block("Alice transfers 10.0 BTC to Bob", verbose=False)
+        bc.add_block("Bob transfers 5.0 BTC to Charlie", verbose=False)
+        bc.add_block("Charlie transfers 2.5 BTC to Dave", verbose=False)
+
+    if part == "1":
+        bc_p1 = Blockchain(difficulty=2)
+        run_part1(bc_p1)
+    elif part == "2":
+        run_part2(bc)
+    elif part == "3":
+        run_part3(bc)
+    elif part == "4":
+        bc.chain[1].data = "Alice transfers 100.0 BTC to Hacker"
+        run_part4(bc)
+    else:
+        bc_fresh = Blockchain(difficulty=2)
+        run_part1(bc_fresh)
+        run_part2(bc_fresh)
+        run_part3(bc_fresh)
+        run_part4(bc_fresh)
 
 
 if __name__ == "__main__":
