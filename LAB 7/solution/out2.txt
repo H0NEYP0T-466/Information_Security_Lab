@@ -3,132 +3,82 @@
  Author: Muhammad Fezan (Fall-23-BSCS-466) | Course: IS(L)
 ====================================================================
 
-[Step 1] Initializing three independent P2P network nodes...
-         Created: Node1, Node2, Node3 (each holding isolated Genesis block)
-
-[Step 2] Mining a new block on Node1 (Miner: 0xNode1_Miner)...
-
--- State before network synchronization --
-Node1 chain length: 2 blocks (Genesis + Mined Block #1)
-Node2 chain length: 1 blocks (Genesis only)
-Node3 chain length: 1 blocks (Genesis only)
-
-[Step 3] Propagating block and synchronizing Node2 and Node3 with Node1...
-[*] [Node2] Initiating P2P sync with [Node1]...
-    Local Chain Length: 1 | Peer Chain Length: 2
-    [+] SUCCESS: [Node2] adopted longer chain from [Node1]!
-        Blocks updated: 1 -> 2
-        Latest Block Hash: 002748bad3aefa6736d60a6e...
-[*] [Node3] Initiating P2P sync with [Node1]...
-    Local Chain Length: 1 | Peer Chain Length: 2
-    [+] SUCCESS: [Node3] adopted longer chain from [Node1]!
-        Blocks updated: 1 -> 2
-        Latest Block Hash: 002748bad3aefa6736d60a6e...
-
-[Step 4] Displaying blockchain ledger of each node after Phase 1 sync:
-
-+==================================================================+
-| Node: Node1                | Total Blocks: 2    | Valid: 1     |
-+------------------------------------------------------------------+
-| Idx  | Miner / Data             | Nonce  | Hash (prefix)          |
-+------------------------------------------------------------------+
-| 0    | Genesis                  | 463    | 00b2b657316485d8f815.. |
-| 1    | 0xNode1_Miner            | 20     | 002748bad3aefa6736d6.. |
-+==================================================================+
-
-+==================================================================+
-| Node: Node2                | Total Blocks: 2    | Valid: 1     |
-+------------------------------------------------------------------+
-| Idx  | Miner / Data             | Nonce  | Hash (prefix)          |
-+------------------------------------------------------------------+
-| 0    | Genesis                  | 463    | 00b2b657316485d8f815.. |
-| 1    | 0xNode1_Miner            | 20     | 002748bad3aefa6736d6.. |
-+==================================================================+
-
-+==================================================================+
-| Node: Node3                | Total Blocks: 2    | Valid: 1     |
-+------------------------------------------------------------------+
-| Idx  | Miner / Data             | Nonce  | Hash (prefix)          |
-+------------------------------------------------------------------+
-| 0    | Genesis                  | 463    | 00b2b657316485d8f815.. |
-| 1    | 0xNode1_Miner            | 20     | 002748bad3aefa6736d6.. |
-+==================================================================+
-
-[Step 5] Phase 1 Verification:
+[Step 1] Initializing three independent nodes: Node1, Node2, Node3...
 
 ====================================================================
-           P2P NETWORK CONVERGENCE VERIFICATION
+        NETWORK STATUS MATRIX - INITIAL STATE (GENESIS)
 ====================================================================
-Node Name    | Chain Length   | Latest Block Hash                 
+Node Name    | Blocks   | Valid   | Latest Block Hash               
 --------------------------------------------------------------------
-Node1        | 2              | 002748bad3aefa6736d60a6e0f0aa9f2..
-Node2        | 2              | 002748bad3aefa6736d60a6e0f0aa9f2..
-Node3        | 2              | 002748bad3aefa6736d60a6e0f0aa9f2..
+Node1        | 1        | True    | 00b1f84a637a27dcead913917561b7..
+Node2        | 1        | True    | 00b1f84a637a27dcead913917561b7..
+Node3        | 1        | True    | 00b1f84a637a27dcead913917561b7..
 --------------------------------------------------------------------
-Verification Result: ALL NODES SYNCHRONIZED AND IDENTICAL
-Consensus Status   : PASSED (100% Agreement)
+Network Convergence: PASSED (100% Agreement)
 ====================================================================
 
-[Step 6] Mining Block #2 on Node2 (Miner: 0xNode2_Miner)...
-Node2 chain length increased to 3 blocks.
-
-[Step 7] Synchronizing Node1 and Node3 with Node2...
-[*] [Node1] Initiating P2P sync with [Node2]...
-    Local Chain Length: 2 | Peer Chain Length: 3
-    [+] SUCCESS: [Node1] adopted longer chain from [Node2]!
-        Blocks updated: 2 -> 3
-        Latest Block Hash: 00bab0450b9f82616336b760...
-[*] [Node3] Initiating P2P sync with [Node2]...
-    Local Chain Length: 2 | Peer Chain Length: 3
-    [+] SUCCESS: [Node3] adopted longer chain from [Node2]!
-        Blocks updated: 2 -> 3
-        Latest Block Hash: 00bab0450b9f82616336b760...
-
-[Step 8] Final Network State:
-
-+==================================================================+
-| Node: Node1                | Total Blocks: 3    | Valid: 1     |
-+------------------------------------------------------------------+
-| Idx  | Miner / Data             | Nonce  | Hash (prefix)          |
-+------------------------------------------------------------------+
-| 0    | Genesis                  | 463    | 00b2b657316485d8f815.. |
-| 1    | 0xNode1_Miner            | 20     | 002748bad3aefa6736d6.. |
-| 2    | 0xNode2_Miner            | 123    | 00bab0450b9f82616336.. |
-+==================================================================+
-
-+==================================================================+
-| Node: Node2                | Total Blocks: 3    | Valid: 1     |
-+------------------------------------------------------------------+
-| Idx  | Miner / Data             | Nonce  | Hash (prefix)          |
-+------------------------------------------------------------------+
-| 0    | Genesis                  | 463    | 00b2b657316485d8f815.. |
-| 1    | 0xNode1_Miner            | 20     | 002748bad3aefa6736d6.. |
-| 2    | 0xNode2_Miner            | 123    | 00bab0450b9f82616336.. |
-+==================================================================+
-
-+==================================================================+
-| Node: Node3                | Total Blocks: 3    | Valid: 1     |
-+------------------------------------------------------------------+
-| Idx  | Miner / Data             | Nonce  | Hash (prefix)          |
-+------------------------------------------------------------------+
-| 0    | Genesis                  | 463    | 00b2b657316485d8f815.. |
-| 1    | 0xNode1_Miner            | 20     | 002748bad3aefa6736d6.. |
-| 2    | 0xNode2_Miner            | 123    | 00bab0450b9f82616336.. |
-+==================================================================+
-
-[Step 9] Final P2P Consensus Verification:
+[Step 2] Mining new Block #1 on Node1 (Miner: 0xNode1_Miner)...
 
 ====================================================================
-           P2P NETWORK CONVERGENCE VERIFICATION
+        NETWORK STATUS MATRIX - POST-MINING (NODE1 AHEAD)
 ====================================================================
-Node Name    | Chain Length   | Latest Block Hash                 
+Node Name    | Blocks   | Valid   | Latest Block Hash               
 --------------------------------------------------------------------
-Node1        | 3              | 00bab0450b9f82616336b76011f0814b..
-Node2        | 3              | 00bab0450b9f82616336b76011f0814b..
-Node3        | 3              | 00bab0450b9f82616336b76011f0814b..
+Node1        | 2        | True    | 00658209657c87ca04d467ab48857a..
+Node2        | 1        | True    | 00b1f84a637a27dcead913917561b7..
+Node3        | 1        | True    | 00b1f84a637a27dcead913917561b7..
 --------------------------------------------------------------------
-Verification Result: ALL NODES SYNCHRONIZED AND IDENTICAL
-Consensus Status   : PASSED (100% Agreement)
+Network Convergence: DIVERGENT (Sync Required)
 ====================================================================
-Simulation completed with status: SUCCESS
 
+[Step 3] Synchronizing Node2 and Node3 with Node1...
+[+] [Node2] Synced with [Node1] | Length: 1 -> 2 | Tip: 00658209657c87ca04..
+[+] [Node3] Synced with [Node1] | Length: 1 -> 2 | Tip: 00658209657c87ca04..
+
+[Step 4] Network status after Phase 1 synchronization:
+
+====================================================================
+        NETWORK STATUS MATRIX - PHASE 1 SYNCHRONIZED
+====================================================================
+Node Name    | Blocks   | Valid   | Latest Block Hash               
+--------------------------------------------------------------------
+Node1        | 2        | True    | 00658209657c87ca04d467ab48857a..
+Node2        | 2        | True    | 00658209657c87ca04d467ab48857a..
+Node3        | 2        | True    | 00658209657c87ca04d467ab48857a..
+--------------------------------------------------------------------
+Network Convergence: PASSED (100% Agreement)
+====================================================================
+
+[Step 5] Mining new Block #2 on Node2 (Miner: 0xNode2_Miner)...
+
+====================================================================
+        NETWORK STATUS MATRIX - POST-MINING (NODE2 AHEAD)
+====================================================================
+Node Name    | Blocks   | Valid   | Latest Block Hash               
+--------------------------------------------------------------------
+Node1        | 2        | True    | 00658209657c87ca04d467ab48857a..
+Node2        | 3        | True    | 00b9c049c665bb2b71ab309777c596..
+Node3        | 2        | True    | 00658209657c87ca04d467ab48857a..
+--------------------------------------------------------------------
+Network Convergence: DIVERGENT (Sync Required)
+====================================================================
+
+[Step 6] Synchronizing Node1 and Node3 with Node2...
+[+] [Node1] Synced with [Node2] | Length: 2 -> 3 | Tip: 00b9c049c665bb2b71..
+[+] [Node3] Synced with [Node2] | Length: 2 -> 3 | Tip: 00b9c049c665bb2b71..
+
+[Step 7] Final Network State across all nodes:
+
+====================================================================
+        NETWORK STATUS MATRIX - FINAL NETWORK STATE
+====================================================================
+Node Name    | Blocks   | Valid   | Latest Block Hash               
+--------------------------------------------------------------------
+Node1        | 3        | True    | 00b9c049c665bb2b71ab309777c596..
+Node2        | 3        | True    | 00b9c049c665bb2b71ab309777c596..
+Node3        | 3        | True    | 00b9c049c665bb2b71ab309777c596..
+--------------------------------------------------------------------
+Network Convergence: PASSED (100% Agreement)
+====================================================================
+
+Final P2P Convergence Status: SUCCESS

@@ -4,102 +4,45 @@
 ====================================================================
 
 [Step 1] Initializing Blockchain with Genesis Block...
-         Reward per block : 50.0 coins
-         PoW Difficulty   : 2 leading zeroes
-         Genesis Hash     : 0004b709eecd8bf358a8c3016569d133b61fdb749c866d98e55599319188d6ed
+         Mining Reward : 50.0 coins
+         PoW Difficulty: 2 leading zeros
+         Genesis Hash  : 00ed0781e0a1eecbb615c8af7b01c37665422f8e8a000d0171c35e1c87d66541
 
-[Step 2] Mining blocks for multiple independent miners...
---- Mining Block 1 by 0x71A4_Alice_Miner ---
-[+] Block #1 successfully mined by 0x71A4_Alice_Miner!
-    Hash      : 00aef6ddd524548356fa92e5757b29e30bedce525f3268a8dd2a50d76d056568
-    Prev Hash : 0004b709eecd8bf358a8c3016569d133b61fdb749c866d98e55599319188d6ed
-    Nonce     : 248 (solved in 3.35 ms)
-    Reward    : +50.0 coins credited
+[Step 2] Mining blocks for multiple miners (Alice, Bob, Fezan)...
+[+] Block #1 mined by 0x71A4_Alice_Miner | Nonce: 116 (3.12 ms)
+    Hash: 000a2b313239b4b43e6747f6b067b056441c3e14b3fde72e434f4b9e04d20544 | Reward: +50.0 coins
+[+] Block #2 mined by 0x94B2_Bob_Miner | Nonce: 669 (18.89 ms)
+    Hash: 00cc9047aa9a85e0d6809fe1d6e49ea9b75a997b3b425b1356a8a0fc3160d9ad | Reward: +50.0 coins
+[+] Block #3 mined by 0x71A4_Alice_Miner | Nonce: 407 (12.86 ms)
+    Hash: 00e5dc478b8e6dc5312515337bd8c249fe48663570a2bea9a24a8dd7502728e1 | Reward: +50.0 coins
+[+] Block #4 mined by 0x466F_Fezan_Miner | Nonce: 119 (3.21 ms)
+    Hash: 0081a29841e12209aecc0a4db2c22014f5c9dd46a80345ada7f7a8aee067dae1 | Reward: +50.0 coins
 
---- Mining Block 2 by 0x94B2_Bob_Miner ---
-[+] Block #2 successfully mined by 0x94B2_Bob_Miner!
-    Hash      : 0022ec75fd8a4dc62a226eabe3408f5b4f636238701e9e4bd4ef8be5dec2694a
-    Prev Hash : 00aef6ddd524548356fa92e5757b29e30bedce525f3268a8dd2a50d76d056568
-    Nonce     : 239 (solved in 3.73 ms)
-    Reward    : +50.0 coins credited
-
---- Mining Block 3 by 0x71A4_Alice_Miner ---
-[+] Block #3 successfully mined by 0x71A4_Alice_Miner!
-    Hash      : 00c0b23631a6d2bc3ec12be89f10d466acffbb802d3a40fb5020049115f0bb39
-    Prev Hash : 0022ec75fd8a4dc62a226eabe3408f5b4f636238701e9e4bd4ef8be5dec2694a
-    Nonce     : 1 (solved in 0.03 ms)
-    Reward    : +50.0 coins credited
-
---- Mining Block 4 by 0x466F_Fezan_Miner ---
-[+] Block #4 successfully mined by 0x466F_Fezan_Miner!
-    Hash      : 006ff152a4596b3d5f42a437b6d3aa34d273445a72cf31e1633c639d75fed2e9
-    Prev Hash : 00c0b23631a6d2bc3ec12be89f10d466acffbb802d3a40fb5020049115f0bb39
-    Nonce     : 525 (solved in 7.80 ms)
-    Reward    : +50.0 coins credited
-
-[Step 3] Displaying accumulated miner wallet rewards:
+[Step 3] Displaying miner rewards:
 ====================================================================
            MINER REWARD BALANCES & WALLET LEDGER
 ====================================================================
-Miner Address                        | Blocks Mined   | Total Reward (Coins)
+Miner Address                      | Blocks   | Total Reward (Coins)
 --------------------------------------------------------------------
-0x466F_Fezan_Miner                   | 1              |        50.00 coins
-0x71A4_Alice_Miner                   | 2              |       100.00 coins
-0x94B2_Bob_Miner                     | 1              |        50.00 coins
+0x466F_Fezan_Miner                 | 1        |          50.00 coins
+0x71A4_Alice_Miner                 | 2        |         100.00 coins
+0x94B2_Bob_Miner                   | 1        |          50.00 coins
 --------------------------------------------------------------------
-Total Active Miners      : 3
-Total Rewards Distributed: 200.00 coins
+Total Active Miners: 3 | Total Currency Mined: 200.00 coins
 ====================================================================
 
 [Step 4] Cryptographic chain validation:
          Total blocks in chain : 5
          Chain integrity valid : True
 
+[Step 5] Final Blockchain Ledger Summary:
+
 ====================================================================
-                 CURRENT BLOCKCHAIN LEDGER
+Idx  | Miner / Type               | Nonce   | Block Hash (Prefix)   
+--------------------------------------------------------------------
+0    | SYSTEM                     | 359     | 00ed0781e0a1eecbb615..
+1    | 0x71A4_Alice_Miner         | 116     | 000a2b313239b4b43e67..
+2    | 0x94B2_Bob_Miner           | 669     | 00cc9047aa9a85e0d680..
+3    | 0x71A4_Alice_Miner         | 407     | 00e5dc478b8e6dc53125..
+4    | 0x466F_Fezan_Miner         | 119     | 0081a29841e12209aecc..
 ====================================================================
-Block Index  : 0
-Timestamp    : 2025-11-18 12:13:20
-Block Type   : Genesis
-Beneficiary  : SYSTEM_NETWORK
-Reward Amount: 0.0 coins
-Nonce (PoW)  : 336
-Prev Hash    : 0000000000000000000000000000000000000000000000000000000000000000
-Current Hash : 0004b709eecd8bf358a8c3016569d133b61fdb749c866d98e55599319188d6ed
---------------------------------------------------------------------
-Block Index  : 1
-Timestamp    : 2026-11-18 10:58:16
-Block Type   : Mining_Reward
-Beneficiary  : 0x71A4_Alice_Miner
-Reward Amount: 50.0 coins
-Nonce (PoW)  : 248
-Prev Hash    : 0004b709eecd8bf358a8c3016569d133b61fdb749c866d98e55599319188d6ed
-Current Hash : 00aef6ddd524548356fa92e5757b29e30bedce525f3268a8dd2a50d76d056568
---------------------------------------------------------------------
-Block Index  : 2
-Timestamp    : 2026-11-18 10:58:16
-Block Type   : Mining_Reward
-Beneficiary  : 0x94B2_Bob_Miner
-Reward Amount: 50.0 coins
-Nonce (PoW)  : 239
-Prev Hash    : 00aef6ddd524548356fa92e5757b29e30bedce525f3268a8dd2a50d76d056568
-Current Hash : 0022ec75fd8a4dc62a226eabe3408f5b4f636238701e9e4bd4ef8be5dec2694a
---------------------------------------------------------------------
-Block Index  : 3
-Timestamp    : 2026-11-18 10:58:16
-Block Type   : Mining_Reward
-Beneficiary  : 0x71A4_Alice_Miner
-Reward Amount: 50.0 coins
-Nonce (PoW)  : 1
-Prev Hash    : 0022ec75fd8a4dc62a226eabe3408f5b4f636238701e9e4bd4ef8be5dec2694a
-Current Hash : 00c0b23631a6d2bc3ec12be89f10d466acffbb802d3a40fb5020049115f0bb39
---------------------------------------------------------------------
-Block Index  : 4
-Timestamp    : 2026-11-18 10:58:16
-Block Type   : Mining_Reward
-Beneficiary  : 0x466F_Fezan_Miner
-Reward Amount: 50.0 coins
-Nonce (PoW)  : 525
-Prev Hash    : 00c0b23631a6d2bc3ec12be89f10d466acffbb802d3a40fb5020049115f0bb39
-Current Hash : 006ff152a4596b3d5f42a437b6d3aa34d273445a72cf31e1633c639d75fed2e9
---------------------------------------------------------------------
